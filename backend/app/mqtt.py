@@ -36,8 +36,9 @@ class MQTT:
         # 3. REGISTER CALLBACK FUNCTION(S) FOR EACH TOPIC USING THE self.client.message_callback_add("topic",self.function) FUNCTION
         # WHICH TAKES A TOPIC AND THE NAME OF THE CALLBACK FUNCTION YOU HAVE CREATED FOR THIS SPECIFIC TOPIC
         self.client.message_callback_add("620155827",self.update)
-         
-
+        self.client.message_callback_add("620155827_sub",self.update)
+        self.client.message_callback_add("620155827_pub",self.update)
+        
         # 4. UPDATE MQTT SERVER AND PORT INFORMATION BELOW
         self.client.connect_async("dbs.msjrealtms.com", 1883, 60)
        

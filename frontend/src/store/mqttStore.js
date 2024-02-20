@@ -15,20 +15,17 @@ export const useMqttStore =  defineStore('mqtt', ()=>{
     */ 
 
     // STATES 
-    const mqtt              = ref(null);
+    const mqtt              = ref(null);    
     const host              = ref("dbs.msjrealtms.com");  // Host Name or IP address
     const port              = ref(9002);  // Port number
-    const payload           = ref({"id":620155827,"timestamp": 1702566538,"number":0,"ledA":0,"ledB":0}); // Set initial values for payload
+    const payload           = ref({"type": "controls", "brightness": 255, "nodes": 7, "color": { "r": 255, "g": 255, "b": 255, "a": 1 },"temperature":0,"humidity":0, "heatIndex":0 }); // Set initial values for payload
     const payloadTopic      = ref("");
     const subTopics         = ref({});
- 
-
 
     // ACTIONS
-    
     const onSuccess = ()=> {
         // called when the connect acknowledgement has been received from the server.
-        // console.log(`Connected to: ${host.value}`);      
+         console.log(`Connected to: ${host.value}`);      
     }
 
     const onConnected = (reconnect,URI)=> {
@@ -53,24 +50,24 @@ export const useMqttStore =  defineStore('mqtt', ()=>{
         if (response.errorCode !== 0) {
             console.log(`MQTT: Connection lost - ${response.errorMessage}`);
         }
-        }
+    }
   
     const onFailure = (response) => {
         // called when the connect request has failed or timed out.
         const host = response.invocationContext.host;   
         console.log(`MQTT: Connection to ${host} failed. \nError message : ${response.errorMessage}`);                  
-        };
+    };
     
     const onMessageArrived = (response) => {
-           // called when a message has arrived in this Paho.MQTT.client.
-           try {
+        // called when a message has arrived in this Paho.MQTT.client.
+        try {
             payload.value       = JSON.parse(response.payloadString); 
             payloadTopic.value  = response.destinationName;
             console.log(`Topic : ${payloadTopic.value} \nPayload : ${response.payloadString}`);  
-           } catch (error) {
+        } catch (error) {
             console.log(`onMessageArrived Error: ${error}`);
-           }
         }
+    }
  
     const makeid = (length) =>{
         var result           = '';
@@ -79,9 +76,9 @@ export const useMqttStore =  defineStore('mqtt', ()=>{
 
         for ( var i = 0; i < length; i++ ) {
             result += characters.charAt(Math.floor(Math.random() * charactersLength));
-            }
+        }
         return "IOT_F_"+result;
-        };
+    };
 
     // SUBCRIBE UTIL FUNCTIONS
     const sub_onSuccess = (response) => {   
@@ -89,13 +86,13 @@ export const useMqttStore =  defineStore('mqtt', ()=>{
         const topic = response.invocationContext.topic;  
         console.log(`MQTT: Subscribed  to - ${topic}`);  
         subTopics.value[topic] = "subscribed"; 
-        }
+    }
 
     const sub_onFailure = (response) => {       
         // called when the subscribe request has failed or timed out.     
         const topic = response.invocationContext.topic;  
         console.log(`MQTT: Failed to subscribe to - ${topic} \nError message : ${response.errorMessage}`);  
-        }
+    }
 
     const subscribe = (topic) => {
         // Subscribe for messages, request receipt of a copy of messages sent to the destinations described by the filter.
@@ -105,30 +102,28 @@ export const useMqttStore =  defineStore('mqtt', ()=>{
         mqtt.value.subscribe(topic,subscribeOptions);   
         } catch (error) {
             console.log(`MQTT: Unable to Subscribe ${error} `);
-        }
-              
-        }
+        }  
+    }
 
-    
     // UNSUBSCRIBE UTIL FUNCTIONS
     const unSub_onSuccess = (response) => {    
         // called when the unsubscribe acknowledgement has been received from the server.        
         const topic = response.invocationContext.topic;  
         console.log(`MQTT: Unsubscribed from - ${topic}`);          
         delete subTopics.value[topic];
-        }
+    }
 
     const unSub_onFailure = (response) => {   
         // called when the unsubscribe request has failed or timed out.          
         const topic = response.invocationContext.topic;  
         console.log(`MQTT: Failed to unsubscribe from - ${topic} \nError message : ${response.errorMessage}`);  
-        }
+    }
 
     const unsubcribe = (topic) => {     
         // Unsubscribe for messages, stop receiving messages sent to destinations described by the filter.      
         var unsubscribeOptions	 = { onSuccess: unSub_onSuccess, onFailure: unSub_onFailure, invocationContext:{"topic":topic} }
         mqtt.value.unsubscribe(topic, unsubscribeOptions);         
-        }
+    }
     
     const unsubcribeAll = () => {   
         // Unsubscribe for messages, stop receiving messages sent to destinations described by the filter.      
@@ -138,23 +133,21 @@ export const useMqttStore =  defineStore('mqtt', ()=>{
                 var unsubscribeOptions	 = { onSuccess: unSub_onSuccess, onFailure: unSub_onFailure, invocationContext:{"topic":topic} }
                 mqtt.value.unsubscribe(topic, unsubscribeOptions);
             });
-            }  
-            
+        }
             disconnect();
         }
-
 
     // PUBLISH UTIL FUNCTION
     const publish = (topic, payload) => { 
         const message           = new Paho.MQTT.Message(payload);
         message.destinationName = topic;
         mqtt.value.publish(message);                     
-         }
+    }
 
     // DISCONNECT UTIL FUNCTION
     const disconnect = () => {  
         mqtt.value.disconnect();                     
-        }
+    }
  
 
     const connect = ()=> {
@@ -183,5 +176,3 @@ export const useMqttStore =  defineStore('mqtt', ()=>{
         disconnect,
        }
 },{ persist: true  });
-
- 

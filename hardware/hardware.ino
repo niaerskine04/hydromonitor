@@ -57,10 +57,10 @@ static uint16_t mqtt_port        = 1883;
 
 // WIFI CREDENTIALS
 const char* ssid       = "MonaConnect";     // Add your Wi-Fi ssid
-const char* password   = ""; // Add your Wi-Fi password 
+const char* password   = "";                // Add your Wi-Fi password 
 
-//const char* ssid       = "CWC-6848515";     // Add your Wi-Fi ssid
-//const char* password   = "ddcdwwSWg4cb"; // Add your Wi-Fi password 
+// const char* ssid       = "CWC-6848515";     // Add your Wi-Fi ssid
+// const char* password   = "ddcdwwSWg4cb"; // Add your Wi-Fi password 
 
 
 
